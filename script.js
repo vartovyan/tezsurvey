@@ -2,7 +2,7 @@
    CONFIGURATION
    ============================================ */
 // IMPORTANT: Replace with your deployed Google Apps Script web app URL
-const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZFYcGg7wvFOzhE8hjgjFlw_e2W0SWnXVBKXZSpDw8dLt0hONsjPWZr9VRBh8BMDo4/exec';
 
 /* ============================================
    SECTION NAVIGATION STATE
