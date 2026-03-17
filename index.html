@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Romantik İlişkiler ve Çocukluk Deneyimleri Araştırması</title>
+  <meta name="description" content="İstanbul Bilgi Üniversitesi Psikoloji Bölümü lisans bitirme tezi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  <div class="container">
+    <header class="survey-header">
+      <div class="header-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </div>
+      <h1>Romantik İlişkiler ve Çocukluk Deneyimleri Araştırması</h1>
+      <p class="subtitle">İstanbul Bilgi Üniversitesi &middot; Psikoloji Bölümü</p>
+      <p class="meta">Doç. Dr. Deniz Tahiroğlu danışmanlığında &middot; Merve Ceren Çırağ</p>
+    </header>
+    <main id="survey-main">
+      <form id="survey-form" novalidate>
+        <!-- Consent -->
+        <section class="survey-section" id="consent-section">
+          <div class="section-card">
+            <div class="section-badge">Bilgilendirilmiş Onam</div>
+            <h2>Bilgilendirilmiş Onam Formu</h2>
+            <p class="section-subtitle">Sayın Katılımcı,</p>
+            <div class="consent-text" id="consent-text-block"></div>
+            <fieldset class="question-group" id="qg-consent">
+              <legend>Bilgilendirilmiş onam metnini okudum ve araştırmaya gönüllü olarak katılmayı kabul ediyorum. <span class="required-marker">*</span></legend>
+              <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="consent" value="Kabul ediyorum" required><span class="radio-custom"></span><span class="radio-text">Kabul ediyorum</span></label>
+                <label class="radio-label"><input type="radio" name="consent" value="Kabul etmiyorum"><span class="radio-custom"></span><span class="radio-text">Kabul etmiyorum</span></label>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+        <!-- Demographics -->
+        <section class="survey-section" id="demographics-section">
+          <div class="section-card">
+            <div class="section-badge">Bölüm 1 / 4</div>
+            <h2>Sosyodemografik Bilgi Formu</h2>
+            <div id="demographics-container"></div>
+          </div>
+        </section>
+        <!-- Scale 1 -->
+        <section class="survey-section" id="scale1-section">
+          <div class="section-card">
+            <div class="section-badge">Bölüm 2 / 4</div>
+            <h2>Eş Bağımlılık Belirleme Ölçeği</h2>
+            <p class="scale-instructions" id="scale1-instructions"></p>
+            <div class="scale-legend" id="scale1-legend"></div>
+            <div id="scale1-container" class="likert-container"></div>
+          </div>
+        </section>
+        <!-- Scale 2 -->
+        <section class="survey-section" id="scale2-section">
+          <div class="section-card">
+            <div class="section-badge">Bölüm 3 / 4</div>
+            <h2>Yakın İlişkilerde Yaşantılar Envanteri-II</h2>
+            <p class="scale-instructions" id="scale2-instructions"></p>
+            <p class="scale-instructions" id="scale2-instructions2"></p>
+            <div class="scale-legend" id="scale2-legend"></div>
+            <div id="scale2-container" class="likert-container"></div>
+          </div>
+        </section>
+        <!-- Scale 3 -->
+        <section class="survey-section" id="scale3-section">
+          <div class="section-card">
+            <div class="section-badge">Bölüm 4 / 4</div>
+            <h2>Olumlu Çocukluk Yaşantıları Ölçeği</h2>
+            <p class="scale-instructions" id="scale3-instructions"></p>
+            <div class="scale-legend" id="scale3-legend"></div>
+            <div id="scale3-container" class="likert-container"></div>
+          </div>
+        </section>
+        <!-- Submit -->
+        <section class="submit-section" id="submit-section">
+          <button type="submit" id="submit-btn" class="btn-submit">
+            <span class="btn-text">Anketi Gönder</span>
+            <span class="btn-spinner hidden" id="btn-spinner"><svg class="spinner-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4" stroke-linecap="round"/></svg></span>
+          </button>
+          <p class="submit-note">Tüm zorunlu soruları yanıtladığınızdan emin olunuz.</p>
+        </section>
+      </form>
+    </main>
+    <!-- Disqualified: Consent -->
+    <div id="disqualified-consent" class="message-container hidden">
+      <div class="message-card message-warning">
+        <div class="message-icon"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+        <h2>Katılımınız için Teşekkür Ederiz</h2>
+        <p>Katılmayı kabul etmediğiniz için araştırmaya devam edememekteyiz.</p>
+        <p>İlginiz için teşekkür ederiz.</p>
+      </div>
+    </div>
+    <!-- Disqualified: No Relationship -->
+    <div id="disqualified-relationship" class="message-container hidden">
+      <div class="message-card message-warning">
+        <div class="message-icon"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+        <h2>Katılımınız için Teşekkür Ederiz</h2>
+        <p>Araştırma yalnızca şu anda romantik bir ilişki içinde olan bireyleri kapsamaktadır. Bu nedenle ankete devam edemiyorsunuz.</p>
+        <p>İlginiz için teşekkür ederiz.</p>
+      </div>
+    </div>
+    <!-- Thank You -->
+    <div id="thank-you" class="message-container hidden">
+      <div class="message-card message-success">
+        <div class="message-icon"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <h2>Yanıtlarınız Başarıyla Kaydedildi!</h2>
+        <div class="debriefing" id="debriefing-text"></div>
+      </div>
+    </div>
+    <div id="validation-toast" class="validation-toast hidden"><span id="toast-message"></span></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
