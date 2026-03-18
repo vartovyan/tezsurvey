@@ -7,7 +7,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZFYcGg7wvFOzhE8hjg
 /* ============================================
    SECTION NAVIGATION STATE
    ============================================ */
-const SECTION_IDS = ['consent-section', 'demographics-section', 'scale1-section', 'scale2-section', 'scale3-section', 'submit-section'];
+const SECTION_IDS = ['consent-section', 'demographics-section', 'demographics-section-2', 'scale1-section', 'scale2-section', 'scale3-section', 'submit-section'];
 let currentSectionIndex = 0;
 
 /* ============================================
@@ -38,7 +38,7 @@ const DEBRIEFING_HTML = `
 /* ============================================
    DEMOGRAPHICS QUESTIONS DATA
    ============================================ */
-const DEMOGRAPHICS = [
+const DEMOGRAPHICS_1 = [
   {
     id: 'age', type: 'radio', name: 'age', required: true,
     legend: 'Yaşınız:',
@@ -59,7 +59,10 @@ const DEMOGRAPHICS = [
     legend: 'Mevcut bir romantik ilişkiniz var mı?',
     options: ['Evet', 'Hayır'],
     disqualifyValue: 'Hayır'
-  },
+  }
+];
+
+const DEMOGRAPHICS_2 = [
   {
     id: 'reltype', type: 'radio', name: 'relationship_type', required: true,
     legend: 'İlişki Durumunuz:',
@@ -201,7 +204,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderConsentText();
   renderDebriefingText();
-  renderDemographics();
+  renderDemographics('demographics-container', DEMOGRAPHICS_1);
+  renderDemographics('demographics-container-2', DEMOGRAPHICS_2);
   renderScaleInstructions();
   renderScaleLegends();
   renderLikertScale('scale1-container', SCALE1_QUESTIONS, 5, SCALE1_LABELS, 's1');
@@ -310,18 +314,30 @@ function validateSection(sectionId) {
   }
 
   if (sectionId === 'demographics-section') {
-    // Required radios in demographics
+    // Part 1: Basic demographics
     const demoRadios = [
       { name: 'age', fieldId: 'qg-age', msg: 'Lütfen yaşınızı seçiniz.' },
       { name: 'gender', fieldId: 'qg-gender', msg: 'Lütfen cinsiyetinizi seçiniz.' },
       { name: 'education', fieldId: 'qg-education', msg: 'Lütfen eğitim düzeyinizi seçiniz.' },
-      { name: 'relationship_status', fieldId: 'qg-relationship', msg: 'Lütfen ilişki durumunuzu seçiniz.' },
+      { name: 'relationship_status', fieldId: 'qg-relationship', msg: 'Lütfen ilişki durumunuzu seçiniz.' }
+    ];
+    for (const item of demoRadios) {
+      if (!document.querySelector(`input[name="${item.name}"]:checked`)) {
+        errors.push({ fieldId: item.fieldId, message: item.msg });
+        return errors;
+      }
+    }
+  }
+
+  if (sectionId === 'demographics-section-2') {
+    // Part 2: Relationship details + Family
+    const demoRadios2 = [
       { name: 'relationship_type', fieldId: 'qg-reltype', msg: 'Lütfen ilişki türünüzü seçiniz.' },
       { name: 'relationship_duration', fieldId: 'qg-duration', msg: 'Lütfen ilişki sürenizi seçiniz.' },
       { name: 'parents_marital', fieldId: 'qg-parents', msg: 'Lütfen ebeveyn birliktelik durumunu seçiniz.' },
       { name: 'family_structure', fieldId: 'qg-family', msg: 'Lütfen aile yapısını seçiniz.' }
     ];
-    for (const item of demoRadios) {
+    for (const item of demoRadios2) {
       if (!document.querySelector(`input[name="${item.name}"]:checked`)) {
         errors.push({ fieldId: item.fieldId, message: item.msg });
         return errors;
@@ -369,11 +385,11 @@ function renderDebriefingText() {
 /* ============================================
    RENDER: Demographics Section
    ============================================ */
-function renderDemographics() {
-  const container = document.getElementById('demographics-container');
+function renderDemographics(containerId, questions) {
+  const container = document.getElementById(containerId);
   let html = '';
 
-  DEMOGRAPHICS.forEach(q => {
+  questions.forEach(q => {
     const reqMark = q.required ? '<span class="required-marker">*</span>' : '';
     const noteText = q.legendNote ? ` <em>${q.legendNote}</em>` : '';
     html += `<fieldset class="question-group" id="qg-${q.id}">`;
