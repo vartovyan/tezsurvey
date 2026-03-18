@@ -19,6 +19,7 @@ const CONSENT_PARAGRAPHS = [
   'Soruların yanıtlanması sırasında herhangi bir ses veya görüntü kaydı alınmayacak olup cevaplar yazılı olarak araştırma verisinde kullanılmak üzere kaydedilecektir. Araştırma süresinde elde edilen veriler gizli tutulacak olup kişisel bilgiler dolaylı veya doğrudan hiçbir şekilde rapora yansımayacaktır, üçüncü kişilere gösterilmeyecektir.',
   'Araştırma süresince dilediğiniz anda çalışmadan çekilme hakkına sahipsiniz. Ayrıca yanıtlamak istemediğiniz sorulara cevap vermeme hakkınız bulunmaktadır.',
   'Bu formu onayladığınız takdirde yukarıda yer alan bilgileri okuduğunuzu, anladığınızı ve araştırmaya gönüllü olarak katılmayı kabul ettiğinizi göstermektedir.',
+  'Bu araştırmanın güvenilirliğini korumak ve mükerrer katılımları önlemek amacıyla, bu anket daha önce katılım sağlayıp sağlamadığınızı hatırlamak için tarayıcınızın Yerel Depolama (Local Storage) özelliğini kullanmaktadır. Bu, yalnızca cihazınızda saklanan, kesinlikle gerekli ve anonim bir teknik belirteçtir. Kimliğinizi, IP adresinizi veya internet tarayıcı geçmişinizi kesinlikle takip etmez.'
 ];
 
 const CONSENT_CONTACT = 'Çalışma hakkında daha fazla bilgi almak için sorularınızı araştırmanın yürütücüsü Merve Ceren Çırağ\'a <a href="mailto:ceren.cirag@bilgiedu.net">ceren.cirag@bilgiedu.net</a> üzerinden ulaşabilirsiniz.';
@@ -38,11 +39,6 @@ const DEBRIEFING_HTML = `
    DEMOGRAPHICS QUESTIONS DATA
    ============================================ */
 const DEMOGRAPHICS = [
-  {
-    id: 'email', type: 'email', name: 'email', required: true,
-    legend: 'E-posta adresiniz:',
-    placeholder: 'ornek@email.com'
-  },
   {
     id: 'age', type: 'radio', name: 'age', required: true,
     legend: 'Yaşınız:',
@@ -197,6 +193,12 @@ const SCALE3_LABELS = { 1: 'Hiçbir Zaman', 2: 'Nadiren', 3: 'Bazen', 4: 'Çoğu
    DOM READY
    ============================================ */
 document.addEventListener('DOMContentLoaded', () => {
+  // Check if user has already submitted
+  if (localStorage.getItem('survey_submitted')) {
+    showAlreadySubmitted();
+    return;
+  }
+
   renderConsentText();
   renderDebriefingText();
   renderDemographics();
@@ -264,6 +266,15 @@ function goToNextSection(currentIndex) {
     return;
   }
 
+  // Check for relationship disqualification when leaving demographics
+  if (sectionId === 'demographics-section') {
+    const relStatus = document.querySelector('input[name="relationship_status"]:checked');
+    if (relStatus && relStatus.value === 'Hayır') {
+      disqualify('disqualified-relationship', true);
+      return;
+    }
+  }
+
   // Hide current section, show next
   const currentSection = document.getElementById(SECTION_IDS[currentIndex]);
   const nextIndex = currentIndex + 1;
@@ -299,12 +310,6 @@ function validateSection(sectionId) {
   }
 
   if (sectionId === 'demographics-section') {
-    // Email
-    const emailInput = document.querySelector('input[name="email"]');
-    if (emailInput && (!emailInput.value || !emailInput.value.includes('@'))) {
-      errors.push({ fieldId: 'qg-email', message: 'Lütfen geçerli bir e-posta adresi giriniz.' });
-      return errors;
-    }
     // Required radios in demographics
     const demoRadios = [
       { name: 'age', fieldId: 'qg-age', msg: 'Lütfen yaşınızı seçiniz.' },
@@ -326,33 +331,6 @@ function validateSection(sectionId) {
     if (document.querySelectorAll('input[name="caregivers"]:checked').length === 0) {
       errors.push({ fieldId: 'qg-caregivers', message: 'Lütfen en az bir bakım veren kişi seçiniz.' });
       return errors;
-    }
-  }
-
-  if (sectionId === 'scale1-section') {
-    for (let i = 1; i <= SCALE1_QUESTIONS.length; i++) {
-      if (!document.querySelector(`input[name="s1_q${i}"]:checked`)) {
-        errors.push({ fieldId: `li-s1_q${i}`, message: `Eş Bağımlılık Ölçeği: Lütfen ${i}. soruyu yanıtlayınız.` });
-        return errors;
-      }
-    }
-  }
-
-  if (sectionId === 'scale2-section') {
-    for (let i = 1; i <= SCALE2_QUESTIONS.length; i++) {
-      if (!document.querySelector(`input[name="s2_q${i}"]:checked`)) {
-        errors.push({ fieldId: `li-s2_q${i}`, message: `Yakın İlişkiler Envanteri: Lütfen ${i}. soruyu yanıtlayınız.` });
-        return errors;
-      }
-    }
-  }
-
-  if (sectionId === 'scale3-section') {
-    for (let i = 1; i <= SCALE3_QUESTIONS.length; i++) {
-      if (!document.querySelector(`input[name="s3_q${i}"]:checked`)) {
-        errors.push({ fieldId: `li-s3_q${i}`, message: `Çocukluk Yaşantıları Ölçeği: Lütfen ${i}. soruyu yanıtlayınız.` });
-        return errors;
-      }
     }
   }
 
@@ -448,7 +426,7 @@ function renderDemographics() {
    ============================================ */
 function renderScaleInstructions() {
   document.getElementById('scale1-instructions').textContent =
-    'Aşağıdaki soruları okuyarak size uygun gelen seçeneği gösteren rakamı işaretleyiniz. Doğru ya da yanlış cevap yoktur. Lütfen içinizden gelen fikri işaretleyiniz ve 25 sorunun hepsini okuyup işaretlediğinizden emin olunuz.';
+    'Aşağıdaki soruları okuyarak size uygun gelen seçeneği gösteren rakamı işaretleyiniz. Doğru ya da yanlış cevap yoktur. Lütfen içinizden gelen fikri işaretleyiniz.';
 
   document.getElementById('scale2-instructions').innerHTML =
     'Aşağıdaki maddeler romantik ilişkilerinizde hissettiğiniz duygularla ilgilidir. Bu araştırmada sizin ilişkinizde yalnızca şu anda değil, genel olarak neler olduğuyla ya da neler yaşadığınızla ilgilenmekteyiz. Maddelerde sözü geçen <strong>"birlikte olduğum kişi"</strong> ifadesi ile romantik ilişkide bulunduğunuz kişi kastedilmektedir.';
@@ -500,7 +478,7 @@ function renderLikertScale(containerId, questions, points, edgeLabels, prefix) {
     for (let i = 1; i <= points; i++) {
       const edgeLabel = (i === 1 || i === points || edgeLabels[i]) ? (edgeLabels[i] || '') : '';
       html += `<label class="likert-option">`;
-      html += `<input type="radio" name="${fieldName}" value="${i}" required>`;
+      html += `<input type="radio" name="${fieldName}" value="${i}">`;
       html += `<span class="likert-circle">${i}</span>`;
       html += `<span class="likert-edge-label">${edgeLabel}</span>`;
       html += `</label>`;
@@ -516,27 +494,27 @@ function renderLikertScale(containerId, questions, points, edgeLabels, prefix) {
    DISQUALIFICATION LOGIC
    ============================================ */
 function setupDisqualificationListeners() {
-  // Consent disqualification
+  // Consent disqualification — do NOT block returning (they might reconsider)
   document.querySelectorAll('input[name="consent"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
       if (e.target.value === 'Kabul etmiyorum') {
-        disqualify('disqualified-consent');
+        disqualify('disqualified-consent', false);
       }
     });
   });
 
-  // Relationship status disqualification (event delegation for dynamic content)
-  document.getElementById('demographics-container').addEventListener('change', (e) => {
-    if (e.target.name === 'relationship_status' && e.target.value === 'Hayır') {
-      disqualify('disqualified-relationship');
-    }
-  });
 }
 
-function disqualify(messageId) {
+
+function disqualify(messageId, blockReturn) {
   const main = document.getElementById('survey-main');
   const message = document.getElementById(messageId);
   const progress = document.getElementById('progress-container');
+
+  // Only block returning visits for relationship disqualification
+  if (blockReturn) {
+    localStorage.setItem('survey_submitted', 'true');
+  }
 
   // Submit the currently collected data (disqualification record)
   submitPartialData();
@@ -653,10 +631,6 @@ function collectFormData() {
 
   data.timestamp = new Date().toISOString();
 
-  // Email
-  const emailEl = document.querySelector('input[name="email"]');
-  if (emailEl) data.email = emailEl.value;
-
   // Radio fields
   ['consent', 'age', 'gender', 'education', 'relationship_status',
    'relationship_type', 'relationship_duration', 'parents_marital', 'family_structure'
@@ -704,6 +678,9 @@ function collectFormData() {
    SHOW THANK-YOU
    ============================================ */
 function showThankYou() {
+  // Set localStorage flag to prevent duplicate submissions
+  localStorage.setItem('survey_submitted', 'true');
+
   const main = document.getElementById('survey-main');
   const thankYou = document.getElementById('thank-you');
   const progress = document.getElementById('progress-container');
@@ -734,4 +711,17 @@ function showToast(message) {
     toast.classList.remove('show');
     setTimeout(() => toast.classList.add('hidden'), 300);
   }, 4000);
+}
+
+/* ============================================
+   ALREADY SUBMITTED SCREEN
+   ============================================ */
+function showAlreadySubmitted() {
+  const main = document.getElementById('survey-main');
+  const progress = document.getElementById('progress-container');
+  const alreadyMsg = document.getElementById('already-submitted');
+
+  if (main) main.style.display = 'none';
+  if (progress) progress.style.display = 'none';
+  if (alreadyMsg) alreadyMsg.classList.remove('hidden');
 }
