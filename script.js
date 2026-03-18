@@ -645,7 +645,7 @@ function setupFormSubmission() {
 function collectFormData() {
   const data = {};
 
-  data.timestamp = new Date().toISOString();
+  data.timestamp = new Date().toLocaleString('tr-TR');
 
   // Radio fields
   ['consent', 'age', 'gender', 'education', 'relationship_status',
